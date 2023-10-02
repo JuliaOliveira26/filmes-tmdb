@@ -30,11 +30,12 @@ onMounted(async () => {
 <template>
   <h1>Filmes</h1>
   <ul class="genre-list">
+      <loading v-model:active="isLoading" is-full-page />
     <li v-for="genre in Genres" :key="genre.id" @click="listTv(genre.id)" class="genre-item">
     {{ genre.name }}
 </li>
   </ul>
-  <loading v-model:active="isLoading" is-full-page />
+
 
   <div class="movie-list">
   <div v-for="programaMovie in programaMovies" :key="programaMovie.id" class="movie-card">
