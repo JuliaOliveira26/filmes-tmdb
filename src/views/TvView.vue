@@ -7,7 +7,7 @@ const isLoading = ref(false);
 const Genres = ref([])
 const programaMovies = ref([]);
 const formatDate = (date) => new Date(date).toLocaleDateString('pt-BR')
-const getGenresName = (id) => genres.value.find((genre) => genre.id === id).name
+const getGenresName = (id) => genres.value.find((genre) => genre.id === id).title
 
 
 
@@ -28,9 +28,9 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <h1>Filmes</h1>
+  <h1>Programas de TV</h1>
   <ul class="genre-list">
-      <loading v-model:active="isLoading" is-full-page />
+      <Loading v-model:active="isLoading" is-full-page />
     <li v-for="genre in Genres" :key="genre.id" @click="listTv(genre.id)" class="genre-item">
     {{ genre.name }}
 </li>
@@ -40,14 +40,14 @@ onMounted(async () => {
   <div class="movie-list">
   <div v-for="programaMovie in programaMovies" :key="programaMovie.id" class="movie-card">
     
-    <img :src="`https://image.tmdb.org/t/p/w500${programaMovie.poster_path}`" :alt="programaMovie.name" />
+    <img :src="`https://image.tmdb.org/t/p/w500${programaMovie.poster_path}`" :alt="programaMovie.title" />
     <div class="tv-details">
       <p class="tv-title">{{ programaMovie.original_name }}</p>
       <p class="tv-release-date">{{ programaMovie.first_air_date }}</p>
       <p class="tv-release-date">{{ formatDate(programaMovie.release_date) }}</p>
       <p class="tv-genres">
 
-  <span v-for="genre_id in programaMovie.genre_ids" :key="genre_id" @click="listTv(genre_id)">
+  <span v-for="genre_id in programaMovie.Genre_ids" :key="genre_id" @click="listTv(genre_id)">
     {{ getGenresName(genre_id) }} 
   </span>
 </p>
