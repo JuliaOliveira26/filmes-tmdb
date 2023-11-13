@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 import Loading from 'vue-loading-overlay'
 import { useRouter } from 'vue-router'
+import MovieDetailsView from './MovieDetailsView.vue'
 const router = useRouter()
 
 const isLoading = ref(false);
@@ -47,12 +48,13 @@ function openMovie(movieId) {
     <img
   :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
   :alt="movie.title"
-  @click="openMovie(movie.id)"
+  @click= addEventListener.openMovie(movie.id)
 />
     <div class="movie-details">
       <p class="movie-title">{{ movie.title }}</p>
       <p class="movie-release-date">{{ formatDate(movie.release_date) }}</p>
       <p class="movie-genres">
+  
   <span v-for="genre_id in movie.genre_ids" :key="genre_id" @click="listMovies(genre_id)">
     {{ getGenreName(genre_id) }} 
   </span>
