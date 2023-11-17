@@ -1,3 +1,16 @@
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+...
+
+function openMovie(movieId) {
+  router.push({ name: 'MovieDetails', params: { movieId } });
+}
+Note que estamos importando o hook useRouter do vue-router e estamos criando uma função chamada openMovie que recebe o id do filme como parâmetro. Essa função vai redirecionar o usuário para a rota MovieDetails passando o id do filme como parâmetro.
+
+Criando o componente MovieDetailsView.vue
+Vamos criar um novo componente chamado MovieDetailsView.vue, na pasta src/views/ e vamos adicionar o seguinte código:
+
 <script setup>
   import { defineProps, onMounted } from 'vue';
   import { useMovieStore } from '@/stores/movie';
