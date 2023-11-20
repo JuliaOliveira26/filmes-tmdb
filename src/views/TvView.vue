@@ -2,61 +2,74 @@
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 import Loading from 'vue-loading-overlay'
+import genreStore from '@/stores/genres'
+import { useRouter } from 'vue-router'
 
-const isLoading = ref(false);
-const Genres = ref([])
-const programaMovies = ref([]);
+const router = useRouter()
+
+const isLoading = ref(false)
+const programas = ref([])
+
 const formatDate = (date) => new Date(date).toLocaleDateString('pt-BR')
-const getGenresName = (id) => genres.value.find((genre) => genre.id === id).title
 
-
+function openMovie(movieId) {
+  router.push({ name: 'MovieDetails', params: { movieId } });
+}
 
 const listTv = async (genreId) => {
-  isLoading.value = true;
-    const response = await api.get('discover/movie', {
-        params: {
-            with_genres: genreId,
-            language: 'pt-BR'
-        }
-    });
-    programaMovies.value = response.data.results
-    isLoading.value = false
-};
+  genreStore.setCurrentGenreId(genreId)
+  isLoading.value = true
+  const response = await api.get('discover/tv', {
+    params: {
+      with_genres: genreId,
+      language: 'pt-BR'
+    }
+  })
+  programas.value = response.data.results
+  isLoading.value = false
+}
+
 onMounted(async () => {
-  const response = await api.get('genre/movie/list?language=pt-BR')
-  Genres.value = response.data.genres
+  isLoading.value = true
+  await genreStore.getAllGenres('tv')
+  isLoading.value = false
 })
 </script>
+
 <template>
   <h1>Programas de TV</h1>
   <ul class="genre-list">
-      <Loading v-model:active="isLoading" is-full-page />
-    <li v-for="genre in Genres" :key="genre.id" @click="listTv(genre.id)" class="genre-item">
-    {{ genre.name }}
-</li>
+    <li
+      v-for="genre in genreStore.genres"
+      :key="genre.id"
+      @click="listTv(genre.id)"
+      class="genre-item"
+      :class="{ active: genre.id === genreStore.currentGenreId }"
+    >
+      {{ genre.name }}
+    </li>
   </ul>
-
-
-  <div class="movie-list">
-  <div v-for="programaMovie in programaMovies" :key="programaMovie.id" class="movie-card">
-    
-    <img :src="`https://image.tmdb.org/t/p/w500${programaMovie.poster_path}`" :alt="programaMovie.title" />
-    <div class="tv-details">
-      <p class="tv-title">{{ programaMovie.original_name }}</p>
-      <p class="tv-release-date">{{ programaMovie.first_air_date }}</p>
-      <p class="tv-release-date">{{ formatDate(programaMovie.release_date) }}</p>
-      <p class="tv-genres">
-
-  <span v-for="genre_id in programaMovie.Genre_ids" :key="genre_id" @click="listTv(genre_id)">
-    {{ getGenresName(genre_id) }} 
-  </span>
-</p>
+  <loading v-model:active="isLoading" is-full-page />
+  <div class="tv-list">
+    <div v-for="programa in programas" :key="programa.id" class="tv-card">
+      <img :src="`https://image.tmdb.org/t/p/w500${programa.poster_path}`" :alt="programa.name" @click="openMovie(programa.id)" />
+      <div class="tv-details">
+        <p class="tv-title">{{ programa.name }}</p>
+        <p class="tv-release-date">{{ formatDate(programa.first_air_date) }}</p>
+        <p class="tv-genres">
+          <span
+            v-for="genre_id in programa.genre_ids"
+            :key="genre_id"
+            @click="listTv(genre_id)"
+            :class="{ active: genre_id === genreStore.currentGenreId }"
+          >
+            {{ genreStore.getGenreName(genre_id) }}
+          </span>
+        </p>
+      </div>
     </div>
-    
   </div>
-</div>
 </template>
-
 
 <style scoped>
 .genre-list {
@@ -65,41 +78,46 @@ onMounted(async () => {
   flex-wrap: wrap;
   gap: 2rem;
   list-style: none;
-  padding: 0;
+  margin-bottom: 2rem;
 }
 
 .genre-item {
-  background-color: #387250;
+  background-color: #9e3799;
   border-radius: 1rem;
   padding: 0.5rem 1rem;
+  align-self: center;
   color: #fff;
+  display: flex;
+  justify-content: center;
 }
 
 .genre-item:hover {
   cursor: pointer;
-  background-color: #4e9e5f;
-  box-shadow: 0 0 0.5rem #387250;
+  background-color: #e45ddd;
+  box-shadow: 0 0 0.5rem #9e3799;
 }
 
-.movie-list {
+.tv-list {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
 }
 
-.movie-card {
+.tv-card {
   width: 15rem;
   height: 30rem;
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 0 0.5rem #000;
+  margin: 3px;
+  background-color: #f0f0f0;
+  padding: 6px;
 }
 
-.movie-card img {
+.tv-card img {
   width: 100%;
   height: 20rem;
   border-radius: 0.5rem;
-  box-shadow: 0 0 0.5rem #000;
 }
 
 .tv-details {
@@ -112,14 +130,7 @@ onMounted(async () => {
   line-height: 1.3rem;
   height: 3.2rem;
 }
-.movie-list {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2rem;
-  list-style: none;
-  margin-bottom: 2rem;
-}
+
 .tv-genres {
   display: flex;
   flex-direction: row;
@@ -130,7 +141,7 @@ onMounted(async () => {
 }
 
 .tv-genres span {
-  background-color: #748708;
+  background-color: #9e3799;
   border-radius: 0.5rem;
   padding: 0.2rem 0.5rem;
   color: #fff;
@@ -140,8 +151,18 @@ onMounted(async () => {
 
 .tv-genres span:hover {
   cursor: pointer;
-  background-color: #455a08;
-  box-shadow: 0 0 0.5rem #748708;
+  background-color: #e45ddd;
+  box-shadow: 0 0 0.5rem #9e3799;
 }
 
+.active {
+  background-color: #e45ddd;
+  font-weight: bolder;
+}
+
+.tv-genres span.active {
+  background-color: #e45ddd;
+  color: #fff;
+  font-weight: bolder;
+}
 </style>

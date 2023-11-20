@@ -4,7 +4,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/Home.vue')
+    component: () => import('../views/HomeView.vue')
   },
   {
     path: '/filmes',
@@ -19,9 +19,9 @@ const routes = [
   {
     path: '/movie/:movieId',
     name: 'MovieDetails',
-    component: () => import('@/views/MovieDetailsView.vue'),
+    component: () => import('../views/MovieDetailsView.vue'),
     props: true,
-  },
+  }
 ]
 
 const router = createRouter({

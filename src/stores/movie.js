@@ -10,7 +10,7 @@ export const useMovieStore = defineStore('movie', () => {
 
   const currentMovie = computed(() => state.currentMovie);
 
-  const getMovieDetail = async (movieId) => {
+    const getMovieDetail = async (movieId) => {
     const templateStore = useTemplateStore();
     templateStore.setIsLoading(true);
     const response = await api.get(`movie/${movieId}`);

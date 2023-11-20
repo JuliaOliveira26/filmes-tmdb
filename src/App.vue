@@ -1,26 +1,37 @@
-
 <script setup>
+import { ref, onMounted } from 'vue'
+import api from './plugins/axios'
+import Loading from 'vue-loading-overlay'
+import { useTemplateStore } from '@/stores/template'
+
+const templateStore = useTemplateStore()
+const moviesGenres = ref([])
+const TVGenres = ref([])
+
+onMounted(async () => {
+  let response = await api.get('genre/movie/list?language=pt-BR')
+  moviesGenres.value = response.data.genres
+  response =  await api.get('genre/tv/list?language=pt-BR')
+  TVGenres.value = response.data.genres
+})
 </script>
 
 <template>
-  <header>
+   <header>
     <nav>
       <router-link to="/">Home</router-link>
       <router-link to="/filmes">Filmes</router-link>
       <router-link to="/tv">Programas de TV</router-link>
     </nav>
   </header>
+  <loading v-model:active="templateStore.isLoading" is-full-page />
+
   <main>
     <router-view />
   </main>
 </template>
+
 <style scoped>
-nav {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 1rem;
-  column-gap: 2rem;
-}
 header {
   height: 3rem;
   display: flex;

@@ -1,19 +1,7 @@
-import { useRouter } from 'vue-router'
-const router = useRouter()
-
-...
-
-function openMovie(movieId) {
-  router.push({ name: 'MovieDetails', params: { movieId } });
-}
-Note que estamos importando o hook useRouter do vue-router e estamos criando uma função chamada openMovie que recebe o id do filme como parâmetro. Essa função vai redirecionar o usuário para a rota MovieDetails passando o id do filme como parâmetro.
-
-Criando o componente MovieDetailsView.vue
-Vamos criar um novo componente chamado MovieDetailsView.vue, na pasta src/views/ e vamos adicionar o seguinte código:
-
 <script setup>
   import { defineProps, onMounted } from 'vue';
   import { useMovieStore } from '@/stores/movie';
+  
   const movieStore = useMovieStore();
 
   const props = defineProps({
@@ -38,16 +26,15 @@ Vamos criar um novo componente chamado MovieDetailsView.vue, na pasta src/views/
       />
 
       <div class="details">
-        <h1>Filme: {{ movieStore.currentMovie.title }}</h1>
-        <p>{{ movieStore.currentMovie.tagline }}</p>
-        <p>{{ movieStore.currentMovie.overview }}</p>
-        <p>Orçamento: ${{ movieStore.currentMovie.budget }}</p>
-        <p>Avaliação: {{ movieStore.currentMovie.vote_average }}</p>
+        <h1>Filme - {{ movieStore.currentMovie.title }}</h1>
+        <p>{{ movieStore.currentMovie.tagline }} {{ movieStore.currentMovie.overview }}</p> 
+        <p>Orçamento: ${{ movieStore.currentMovie.budget }} </p>
+        <p>Avaliação: {{ movieStore.currentMovie.vote_average }}</p> 
       </div>
     </div>
   </div>
 
-  <p>Produtoras</p>
+  <h3>Produtoras:</h3>
   <div class="companies">
     <template
       v-for="company in movieStore.currentMovie.production_companies"
@@ -72,4 +59,5 @@ Vamos criar um novo componente chamado MovieDetailsView.vue, na pasta src/views/
     align-items: center;
     margin-bottom: 2rem;
   }
+
 </style>
